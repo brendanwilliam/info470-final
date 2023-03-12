@@ -1,36 +1,63 @@
+.grid line,
+.grid path {
+    stroke: #fff;
+}
+
+.x-axis,
+.y-axis,
+.city-label {
+    color: #fff;
+}
+
 .line-plot {
     fill: none;
     stroke-width: 1.5px;
-    stroke: #333;
 }
 
-.company-label {
+.axis-label,
+.city-label {
+    fill: #fff;
+}
+
+.city-label {
     text-anchor: middle;
-    font-size: 20px;
-    font-weight: semibold;
+    font-size: 12px;
+    font-weight: bold;
     opacity: 0.8;
 }
 
 .axis-label {
     text-anchor: middle;
-    font-size: 12px;
+    font-size: 8px;
     font-weight: semibold;
+}
+
+.x-axis,
+.y-axis {
+    opacity: 0.4;
 }
 
 .grid path,
 .grid line {
-    stroke: #fff;
+    opacity: 0.1;
 }
 
 .background {
-    fill: #eee;
+    fill: #333;
+    opacity: 0.4;
 }
 
 body {
     font-family: "Open Sans";
     margin: 0;
+    background-color: black;
 }
 
 #main {
     margin: 20px;
+}
+
+.points {
+    fill: #fff;
+    opacity: 0.5;
 }

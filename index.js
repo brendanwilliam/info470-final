@@ -1,7 +1,7 @@
 /*
- * Date: January 31, 2023
+ * Date: March 12, 2023
  * Author: Brendan Keane
- * Purpose: Lab 4, INFO 474
+ * Purpose: Final Project, INFO 474
  */
 
 // **** Example of how to create padding and spacing for trellis plot****
@@ -13,16 +13,16 @@ var svgHeight = +svg.attr('height');
 
 // Define a padding object
 // This will space out the trellis subplots
-var padding = {t: 20, r: 20, b: 60, l: 60};
+var padding = {t: 20, r: 10, b: 30, l: 30};
 
 // Compute the dimensions of the trellis plots, assuming a 2x2 layout matrix.
-trellisWidth = svgWidth / 2 - padding.l - padding.r;
-trellisHeight = svgHeight / 2 - padding.t - padding.b;
+trellisWidth = svgWidth / 5 - padding.l - padding.r;
+trellisHeight = trellisWidth;
 
 // As an example for how to layout elements with our variables
 // Lets create .background rects for the trellis plots
 svg.selectAll('.background')
-    .data(['A', 'B', 'C', 'C']) // dummy data
+    .data(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']) // dummy data
     .enter()
     .append('rect') // Append 4 rectangles
     .attr('class', 'background')
@@ -31,19 +31,26 @@ svg.selectAll('.background')
     .attr('transform', function(d, i) {
         // Position based on the matrix array indices.
         // i = 1 for column 1, row 0)
-        var tx = (i % 2) * (trellisWidth + padding.l + padding.r) + padding.l;
-        var ty = Math.floor(i / 2) * (trellisHeight + padding.t + padding.b) + padding.t;
+        var tx = (i % 5) * (trellisWidth + padding.l + padding.r) + padding.l;
+        var ty = Math.floor(i / 5) * (trellisHeight + padding.t + padding.b) + padding.t;
         return 'translate('+[tx, ty]+')';
     });
 
 var parseDate = d3.timeParse('%b %Y');
-// To speed things up, we have already computed the domains for your scales
-var dateDomain = [new Date(2000, 0), new Date(2010, 2)];
-var priceDomain = [0, 223.02];
+// // To speed things up, we have already computed the domains for your scales
+var minDiffDomain = [-35, 35];
+var maxDiffDomain = [-35, 35];
+var ticks = [-30, -20, -10, 10, 20, 30];
+
+// Scaling functions for scatter plot
+
+
+// var dateDomain = [new Date(2000, 0), new Date(2010, 2)];
+// var priceDomain = [0, 223.02];
 
 // **** How to properly load data ****
 
-d3.csv('stock_prices.csv').then(function(dataset) {
+d3.csv('ALL_CITIES.csv').then(function(dataset) {
 
     // 1.2 Parse the dates
     dataset.forEach(function(d){
@@ -53,15 +60,15 @@ d3.csv('stock_prices.csv').then(function(dataset) {
     // 1.3 Nest the loaded dataset
     var nested = d3.nest()
         .key(function(c){
-            return c.company
+            return c.city
         })
         .entries(dataset);
 
     console.log(nested);
 
     // 2.2 Create scales for our line charts
-    var xScale = d3.scaleTime().domain(dateDomain).range([0, trellisWidth]);
-    var yScale = d3.scaleLinear().domain(priceDomain).range([trellisHeight, 0]);
+    var xScale = d3.scaleLinear().domain(minDiffDomain).range([0, trellisWidth]);
+    var yScale = d3.scaleLinear().domain(maxDiffDomain).range([trellisHeight, 0]);
 
     // 2.5 Add color
     var colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(nested.map(function(d){
@@ -69,13 +76,15 @@ d3.csv('stock_prices.csv').then(function(dataset) {
     }));
 
     // 2.4 Create axes for each subplot
-    var xAxis = d3.axisBottom(xScale);
-    var yAxis = d3.axisLeft(yScale);
+    var xAxis = d3.axisBottom(xScale)
+        .tickValues(ticks);
+    var yAxis = d3.axisLeft(yScale)
+        .tickValues(ticks);
 
-    // 2.3 Create the line chart
-    var lineInterpolate = d3.line()
-        .x(function(d) { return xScale(d.date); })
-        .y(function(d) { return yScale(d.price); });
+    // // 2.3 Create the line chart
+    // var lineInterpolate = d3.line()
+    //     .x(function(d) { return xScale(d.date); })
+    //     .y(function(d) { return yScale(d.price); });
 
     // 2.1 Append trellis groupings
     var trellisG = svg.selectAll('trellis')
@@ -84,8 +93,8 @@ d3.csv('stock_prices.csv').then(function(dataset) {
         .append('g')
         .attr('class', 'trellis')
         .attr('transform', function(d, i) {
-            var tx = (i % 2) * (trellisWidth + padding.l + padding.r) + padding.l;
-            var ty = Math.floor(i / 2) * (trellisHeight + padding.t + padding.b) + padding.t;
+            var tx = (i % 5) * (trellisWidth + padding.l + padding.r) + padding.l;
+            var ty = Math.floor(i / 5) * (trellisHeight + padding.t + padding.b) + padding.t;
             return 'translate('+[tx, ty]+')';
         });
 
@@ -105,48 +114,52 @@ d3.csv('stock_prices.csv').then(function(dataset) {
         .attr('class', 'y grid')
         .call(yGrid);
 
-    // 2.1.1 Append path to trellis groupings and add line chart
-    trellisG.append('path')
-        .attr('class', 'line-plot')
-        .attr('d', function(d){
-            return lineInterpolate(d.values);
-        })
-        .style('stroke', function(d){
-            return colorScale(d.key);
-        });
+    // // 2.1.1 Append path to trellis groupings and add line chart
+    // trellisG.append('path')
+    //     .attr('class', 'line-plot')
+    //     .attr('d', function(d){
+    //         return lineInterpolate(d.values);
+    //     });;
 
     // 2.1.2 Append axes to each subplot
     trellisG.append('g')
         .attr('class', 'x-axis')
-        .attr('transform', 'translate(0,' + trellisHeight + ')')
+        .attr('transform', 'translate(0,' + trellisHeight/2 + ')')
         .call(xAxis);
 
     trellisG.append('g')
         .attr('class', 'y-axis')
+        .attr('transform', 'translate(' + trellisWidth/2 + ', 0)')
         .call(yAxis);
 
     // 3.1 Append company labels
     trellisG.append('text')
-        .attr('class', 'company-label')
+        .attr('class', 'city-label')
         .text(function(d){
             return d.key;
         })
-        .style('fill', function(d){
-            return colorScale(d.key);
-        })
-        .attr('transform', 'translate(' + (trellisWidth / 2) + ', ' + (trellisHeight / 2) + ')');
+        .attr('transform', 'translate(' + (trellisWidth / 2) + ', ' + (trellisHeight + 20) + ')');
 
-    // 3.2 Append axes labels
-    trellisG.append('text')
-        .attr('class', 'axis-label')
-        .text('Date (by Month)')
-        .attr('transform', 'translate(' + (trellisWidth / 2) + ', ' + (trellisHeight + 34) + ')');
+    // // 3.2 Append axes labels
+    // trellisG.append('text')
+    //     .attr('class', 'axis-label')
+    //     .text('Difference from average min (°F)')
+    //     .attr('transform', 'translate(' + (trellisWidth / 2) + ', ' + (trellisHeight + 34) + ')');
 
-    trellisG.append('text')
-        .attr('class', 'axis-label')
-        .text('Stock Price (USD)')
-        .attr('transform', 'translate(' + (-30) + ', ' + (trellisHeight / 2) + ') rotate(-90)');
+    // trellisG.append('text')
+    //     .attr('class', 'axis-label')
+    //     .text('Difference from average max (°F)')
+    //     .attr('transform', 'translate(' + (-30) + ', ' + (trellisHeight / 2) + ') rotate(-90)');
 
+    trellisG.append('g')
+        .attr('class', 'points')
+        .selectAll('circle')
+        .data(dataset)
+        .enter()
+        .append('circle')
+        .attr('cx', function(d) { return xScale(+d.difference_min_temp); })
+        .attr('cy', function(d) { return yScale(+d.difference_max_temp); })
+        .attr('r', 3);
 });
 
 // Remember code outside of the data callback function will run before the data loads
