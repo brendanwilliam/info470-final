@@ -57,7 +57,12 @@ body {
     margin: 20px;
 }
 
-.points {
-    fill: #fff;
-    opacity: 0.5;
+.point {
+    fill: goldenrod;
+    opacity: 0.3;
+}
+
+svg {
+    padding-right: 20px;
+    padding-top: 20px;
 }

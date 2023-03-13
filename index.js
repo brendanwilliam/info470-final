@@ -37,16 +37,9 @@ svg.selectAll('.background')
     });
 
 var parseDate = d3.timeParse('%b %Y');
-// // To speed things up, we have already computed the domains for your scales
 var minDiffDomain = [-35, 35];
 var maxDiffDomain = [-35, 35];
 var ticks = [-30, -20, -10, 10, 20, 30];
-
-// Scaling functions for scatter plot
-
-
-// var dateDomain = [new Date(2000, 0), new Date(2010, 2)];
-// var priceDomain = [0, 223.02];
 
 // **** How to properly load data ****
 
@@ -70,21 +63,11 @@ d3.csv('ALL_CITIES.csv').then(function(dataset) {
     var xScale = d3.scaleLinear().domain(minDiffDomain).range([0, trellisWidth]);
     var yScale = d3.scaleLinear().domain(maxDiffDomain).range([trellisHeight, 0]);
 
-    // 2.5 Add color
-    var colorScale = d3.scaleOrdinal(d3.schemeCategory10).domain(nested.map(function(d){
-        return d.key;
-    }));
-
     // 2.4 Create axes for each subplot
     var xAxis = d3.axisBottom(xScale)
         .tickValues(ticks);
     var yAxis = d3.axisLeft(yScale)
         .tickValues(ticks);
-
-    // // 2.3 Create the line chart
-    // var lineInterpolate = d3.line()
-    //     .x(function(d) { return xScale(d.date); })
-    //     .y(function(d) { return yScale(d.price); });
 
     // 2.1 Append trellis groupings
     var trellisG = svg.selectAll('trellis')
@@ -114,13 +97,6 @@ d3.csv('ALL_CITIES.csv').then(function(dataset) {
         .attr('class', 'y grid')
         .call(yGrid);
 
-    // // 2.1.1 Append path to trellis groupings and add line chart
-    // trellisG.append('path')
-    //     .attr('class', 'line-plot')
-    //     .attr('d', function(d){
-    //         return lineInterpolate(d.values);
-    //     });;
-
     // 2.1.2 Append axes to each subplot
     trellisG.append('g')
         .attr('class', 'x-axis')
@@ -140,26 +116,14 @@ d3.csv('ALL_CITIES.csv').then(function(dataset) {
         })
         .attr('transform', 'translate(' + (trellisWidth / 2) + ', ' + (trellisHeight + 20) + ')');
 
-    // // 3.2 Append axes labels
-    // trellisG.append('text')
-    //     .attr('class', 'axis-label')
-    //     .text('Difference from average min (°F)')
-    //     .attr('transform', 'translate(' + (trellisWidth / 2) + ', ' + (trellisHeight + 34) + ')');
-
-    // trellisG.append('text')
-    //     .attr('class', 'axis-label')
-    //     .text('Difference from average max (°F)')
-    //     .attr('transform', 'translate(' + (-30) + ', ' + (trellisHeight / 2) + ') rotate(-90)');
-
-    trellisG.append('g')
-        .attr('class', 'points')
-        .selectAll('circle')
-        .data(dataset)
+    trellisG.selectAll('circle')
+        .data(function(d) {return d.values; })
         .enter()
         .append('circle')
-        .attr('cx', function(d) { return xScale(+d.difference_min_temp); })
-        .attr('cy', function(d) { return yScale(+d.difference_max_temp); })
-        .attr('r', 3);
+        .attr('class', 'point')
+        .attr('cx', function(d) { return xScale(d.difference_min_temp); })
+        .attr('cy', function(d) { return yScale(d.difference_max_temp); })
+        .attr('r', 2);
 });
 
 // Remember code outside of the data callback function will run before the data loads
