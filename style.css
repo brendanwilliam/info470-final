@@ -1,12 +1,20 @@
-.grid line,
-.grid path {
+.grid line {
     stroke: #fff;
 }
 
 .x-axis,
 .y-axis,
+.x-vals,
+.y-vals,
 .city-label {
     color: #fff;
+}
+
+.x-vals,
+.y-vals,
+.grid path,
+.grid line {
+    opacity: 0.2;
 }
 
 .line-plot {
@@ -14,16 +22,38 @@
     stroke-width: 1.5px;
 }
 
-.axis-label,
-.city-label {
+.axis-label {
     fill: #fff;
 }
 
 .city-label {
-    text-anchor: middle;
+    fill: rgba(135, 103, 23, 0.845);
+    text-anchor: start;
     font-size: 12px;
     font-weight: bold;
+    opacity: 1;
+}
+
+.title {
     opacity: 0.8;
+}
+
+.title,
+.subtitle,
+#tooltip {
+    fill: white;
+    font-size: 12px;
+    text-anchor: middle;
+}
+
+#tooltip {
+    font-size: 12px;
+}
+
+.subtitle {
+    font-weight: medium;
+    font-size: 12px;
+    opacity: 0.5;
 }
 
 .axis-label {
@@ -35,11 +65,6 @@
 .x-axis,
 .y-axis {
     opacity: 0.4;
-}
-
-.grid path,
-.grid line {
-    opacity: 0.1;
 }
 
 .background {
@@ -63,6 +88,5 @@ body {
 }
 
 svg {
-    padding-right: 20px;
-    padding-top: 20px;
+    padding:10px;
 }
