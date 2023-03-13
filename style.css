@@ -27,10 +27,10 @@
 }
 
 .city-label {
-    fill: rgba(135, 103, 23, 0.845);
+    fill: gray;
     text-anchor: start;
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 18px;
+    font-weight: medium;
     opacity: 1;
 }
 
@@ -40,10 +40,16 @@
 
 .title,
 .subtitle,
-#tooltip {
+.tooltip {
     fill: white;
     font-size: 12px;
     text-anchor: middle;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: black;
+    color: white;
 }
 
 #tooltip {
@@ -84,7 +90,7 @@ body {
 
 .point {
     fill: goldenrod;
-    opacity: 0.3;
+    opacity: 0.4;
 }
 
 svg {

@@ -14,21 +14,21 @@ var svgHeight = +svg.attr('height');
 // Define a padding object
 // This will space out the trellis subplots
 var padding = {t: 20, r: 20, b: 40, l: 20};
-var axesPadding = {t: 0, l:40}
+var axesPadding = {t: 40, l:40}
 
 // Compute the dimensions of the trellis plots, assuming a 2x2 layout matrix.
-trellisWidth = svgWidth / 5 - padding.l - padding.r - axesPadding.l/2;
+trellisWidth = svgWidth / 3 - padding.l - padding.r - axesPadding.l/2;
 trellisHeight = trellisWidth;
 
 // Labels for each axis
 svg.append('text')
     .attr('class', 'title')
-    .attr('transform','translate(' + svgWidth/2 + ',' + (2 * trellisHeight + padding.t*6) + ')')
+    .attr('transform','translate(' + (trellisWidth/2 + padding.l * 2 + axesPadding.l) + ',' + (axesPadding.t) + ')')
     .text('Recorded Difference from Average Min (°F)');
 
 svg.append('text')
     .attr('class', 'title')
-    .attr('transform','translate(40, ' + (trellisWidth + padding.l * 2) + ') rotate(-90)')
+    .attr('transform','translate(' + axesPadding.l + ', ' + (trellisWidth/2 + padding.t + axesPadding.t) + ') rotate(-90)')
     .text('Recorded Difference from Average Max (°F)');
 
 var minDiffDomain = [-30, 30];
@@ -57,9 +57,24 @@ var yVals = d3.axisLeft(yScale)
 
 // **** How to properly load data ****
 
+// Date format
+var dateFormat = "%Y-%-m-%-d";
+var dateText = "%b %d, %Y";
+
+
+// Date parser
+var parseDate = d3.timeParse(dateFormat);
+
+var tooltip = d3.select("body")
+  .append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 1);
+
 d3.csv('ALL_CITIES.csv').then(function(dataset) {
     // Parsing date
-
+    dataset.forEach(function(d){
+        d.date = parseDate(d.date);
+    });
 
     // Nesting city name in data
     var nested = d3.nest()
@@ -75,8 +90,8 @@ d3.csv('ALL_CITIES.csv').then(function(dataset) {
         .append('g')
         .attr('class', 'trellis')
         .attr('transform', function(d, i) {
-            var tx = (i % 5) * (trellisWidth + padding.l + padding.r) + padding.l + axesPadding.l * 1.5;
-            var ty = Math.floor(i / 5) * (trellisHeight + padding.t + padding.b) + padding.t + axesPadding.t;
+            var tx = (i % 3) * (trellisWidth + padding.l + padding.r) + padding.l + axesPadding.l * 1.5;
+            var ty = Math.floor(i / 3) * (trellisHeight + padding.t + padding.b) + padding.t + axesPadding.t;
             return 'translate('+[tx, ty]+')';
         });
 
@@ -124,7 +139,7 @@ d3.csv('ALL_CITIES.csv').then(function(dataset) {
         .text(function(d){
             return d.key;
         })
-        .attr('transform', 'translate(' + (8) + ', ' + (16) + ')');
+        .attr('transform', 'translate(' + (8) + ', ' + (24) + ')');
 
     trellisG.selectAll('circle')
         .data(function(d) {return d.values; })
@@ -133,20 +148,25 @@ d3.csv('ALL_CITIES.csv').then(function(dataset) {
         .attr('class', 'point')
         .attr('cx', function(d) { return xScale(d.difference_min_temp); })
         .attr('cy', function(d) { return yScale(d.difference_max_temp); })
-        .attr('r', 2)
+        .attr('r', 3)
         .on("mouseover", function(d) {
             // Get the mouse position
             var mouseX = d3.event.pageX;
             var mouseY = d3.event.pageY;
             // Create the tooltip text
-            var tooltipText = "Date: " + d.date;
-            console.log(d);
-            // Add the tooltip to the SVG
-            svg.append("text")
-              .attr("id", "tooltip")
-              .attr("x", mouseX)
-              .attr("y", mouseY)
-              .text(tooltipText);
+            var formattedDate = d3.timeFormat(dateText)(d.date);
+            // Create the tooltip text
+            var tooltipText = "Date: " + formattedDate + "<br>" + "High: " +
+                d.actual_max_temp + " °F" + "<br>" + "Low: " + d.actual_min_temp +
+                " °F" + "<br>";
+            // Show the tooltip and adjust its position
+        tooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
+
+        tooltip.html(tooltipText)
+            .style("left", (mouseX + 10) + "px")
+            .style("top", (mouseY - 28) + "px");
           })
           // Add a mouseout event to remove the tooltip
           .on("mouseout", function(d) {
