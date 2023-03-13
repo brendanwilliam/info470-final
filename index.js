@@ -24,12 +24,12 @@ trellisHeight = trellisWidth;
 svg.append('text')
     .attr('class', 'title')
     .attr('transform','translate(' + (trellisWidth/2 + padding.l * 2 + axesPadding.l) + ',' + (axesPadding.t) + ')')
-    .text('Recorded Difference from Average Min (°F)');
+    .text('Difference from Average Min (°F)');
 
 svg.append('text')
     .attr('class', 'title')
     .attr('transform','translate(' + axesPadding.l + ', ' + (trellisWidth/2 + padding.t + axesPadding.t) + ') rotate(-90)')
-    .text('Recorded Difference from Average Max (°F)');
+    .text('Difference from Average Max (°F)');
 
 var minDiffDomain = [-30, 30];
 var maxDiffDomain = [-30, 30];
@@ -132,6 +132,16 @@ d3.csv('ALL_CITIES.csv').then(function(dataset) {
         .attr('class', 'y-axis')
         .attr('transform', 'translate(' + trellisWidth/2 + ', 0)')
         .call(yAxis);
+
+    trellisG.append('text')
+        .attr('class', 'axis-label')
+        .attr('transform', 'translate(' + (trellisWidth - 15) + ',' + (trellisHeight/2 + 15) + ')')
+        .text('Δ MIN');
+
+    trellisG.append('text')
+        .attr('class', 'axis-label')
+        .attr('transform', 'translate(' + (trellisWidth/2 - 20) + ', ' +  (15) + ')')
+        .text('Δ MAX');
 
     // City labels
     trellisG.append('text')
